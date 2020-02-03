@@ -1,122 +1,90 @@
 #include <iostream>
-#include <queue>
-#include <vector>
 #include <cstring>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
-int map[8][8];
-int visited[8][8];
-int N, M;
-int dx[] = {-1,1,0,0};
-int dy[] = {0,0,-1,1};
-int maxV = 0;
+int map[51][51];
+int visited_rotate_info[6];
+int N, M, K;
 
-struct pos{
-	int y, x, cnt;
-	pos(int a, int b, int c) : y(a), x(b), cnt(c) {}
+struct rotat_info {
+	int row, col, range;
+	rotat_info(int a, int b, int c) : row(a), col(b), range(c) {}
 };
 
-void solve(){
-	queue<pos> virus;
-	int temp_map[8][8];
-	int temp_visited[8][8];
-	memset(temp_map,0,sizeof(temp_map));
-	memset(temp_visited,0,sizeof(temp_visited));
+void do_rotate(int tm[][51], int r, int c, int range) {
+	
+	for (int i = 0; i < range; i++) {
+		int s_x = c - i;
+		int s_y = r - i;
+		//2*(i+1) + 1
 
-	for(int i = 0; i<N; i++){
-		for(int j = 0; j<M; j++){
-			if(map[i][j] == 2){
-				virus.push(pos(i,j,0));
-			}
-		}
 	}
-
-	for(int i = 0; i<N; i++){
-		for(int j = 0; j<M; j++){
-			temp_map[i][j] = map[i][j];
-			temp_visited[i][j] = visited[i][j];
-		}
-	}
-
-	while(!virus.empty()){
-		int cx = virus.front().x;
-		int cy = virus.front().y;
-		virus.pop();
-		for(int i = 0; i<4; i++){
-			int nx = cx + dx[i];
-			int ny = cy + dy[i];
-			if(nx < 0 || ny < 0 || nx >= M || ny >= N)
-				continue;
-			if(temp_visited[ny][nx])
-				continue;
-			if(temp_map[ny][nx] == 0 && temp_visited[ny][nx] == 0){
-				temp_visited[ny][nx] = 1;
-				temp_map[ny][nx] = 2;
-				virus.push(pos(ny,nx,0));
-			}
-		}
-	}
-
-	int ans = 0;
-
-	for(int i = 0; i<N; i++){
-		for(int j = 0; j<M; j++){
-			if(temp_map[i][j] == 0){
-				ans++;
-			}
-		}
-	}
-
-	maxV = max(ans,maxV);
-
 }
 
-void dfs(int y, int x, int cnt){
-	if(cnt == 3){
-		solve();
+void solve(vector<rotat_info> &tv) {
+	int temp_map[51][51];
+	memset(temp_map, 0, sizeof(temp_map));
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+
+		}
 	}
-	for(int i = y; i<N; i++){
-		for(int j = 0; j<M; j++){
-			if(map[i][j] == 0 && visited[i][j] == 0) 
-			{
-				visited[i][j] = 1;
-				map[i][j] = 1;
-				dfs(i,j, cnt + 1);
-				visited[i][j] = 0;
-				map[i][j] = 0;
-			}
+
+	for (int i = 0; i < K; i++) {
+		int c_row = tv[i].row;
+		int c_col = tv[i].col;
+		int c_range = tv[i].range;
+		do_rotate(temp_map, c_row, c_col, c_range);
+	}
+	//이후 최소값 계산
+}
+
+void select_order(vector<rotat_info> &origin, vector<rotat_info> &tv) {
+	if (tv.size() == origin.size()) {
+		solve(tv);
+		return;
+	}
+	for (int i = 0; i < K; i++) {
+		if (visited_rotate_info[i] == 0) {
+			visited_rotate_info[i] = 1;
+			tv.push_back(origin[i]);
+			select_order(origin, tv);
+			tv.pop_back();
+			visited_rotate_info[i] = 0;
 		}
 	}
 }
 
-int main(){
+int main() {
 
-	cin >> N >> M;
-	for(int i = 0; i<N; i++){
-		for(int j = 0; j<M; j++){
+	cin >> N >> M >> K;
+	vector<rotat_info> ri;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
 			cin >> map[i][j];
-			/*if(map[i][j] == 2){
-				q.push(pos(i,j,0));
-			}*/
 		}
 	}
 
-	for(int i = 0; i<N; i++){
-		for(int j = 0; j<M; j++){
-			if(map[i][j] == 0) 
-			{
-				visited[i][j] = 1;
-				map[i][j] = 1;
-				dfs(i,j, 1);
-				visited[i][j] = 0;
-				map[i][j] = 0;
-			}
-		}
+	for (int i = 0; i < K; i++) {
+		int a, b, c;
+		cin >> a >> b >> c;
+		ri.push_back(rotat_info(a, b, c));
 	}
 
-	cout << maxV << endl;
+	vector<rotat_info> tv;
+
+	//기본상태 최소값
+	for (int i = 0; i < K; i++) {
+		visited_rotate_info[i] = 1;
+		tv.push_back(ri[i]);
+		select_order(ri, tv);
+		visited_rotate_info[i] = 0;
+		tv.pop_back();
+	}
 
 
 	return 0;
