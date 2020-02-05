@@ -20,7 +20,35 @@ void do_rotate(int tm[][51], int r, int c, int range) {
 		int s_x = c - i;
 		int s_y = r - i;
 		//2*(i+1) + 1
+		int line_range = 2*(i+1) + 1;
+		int temp1 = tm[s_y][s_x];
+		int temp2 = tm[s_y][s_x + 1];
+		for(int j = 1; j<line_range; j++){
+			tm[s_y][s_x + j] = temp1;
+			temp1 = temp2;
+			temp2 = tm[s_y][s_x + j];
+		}
+		//temp1 값으로 계속
+		temp2 = tm[s_y + 1][s_x + line_range - 1];
+		for(int j = 1; j<line_range; j++){
+			tm[s_y + j][s_x] = temp1;
+			temp1 = temp2;
+			temp2 = tm[s_y + j][s_x];
+		}
 
+		temp2 = tm[s_y + line_range - 1][s_x + line_range - 1];
+		for(int j = 1; j<line_range; j++){
+			tm[s_y][s_x-j] = temp1;
+			temp1 = temp2;
+			temp2 = tm[s_y][s_x-j];
+		}
+
+		temp2 = tm[s_y + line_range - 1][s_x];
+		for(int j = 1; j<line_range; j++){
+			tm[s_y-j][s_x] = temp1;
+			temp1 = temp2;
+			temp2 = tm[s_y-j][s_x];
+		}
 	}
 }
 
