@@ -47,42 +47,35 @@ void test_2_2()
 /////////////////////////////////////////////////////////////////////////////////////
 
 
-namespace
-{
-	class FakeInput : public Communicator
-	{
-	public:
-		FakeInput(int keys[]) : fakeKey_(keys) {}		
-
-		virtual int getReqInput() override
-		{
-			return fakeKey_[index++];
-		}
-
-		void send(int result) override {
-			lastResult_ = result;
-		}
-
-		int getLastSent() {
-			return lastResult_;
-		}
-	private:
-		int lastResult_ = 0;
-		int* fakeKey_;
-		int index = 0;
+namespace my{
+	struct CommunicatorSpy : Communicator {
+		public:
+			CommunicatorSpy(int keys[]) : spyKeys(keys) {}
+			virtual int getReqInput() override {
+					return spyKeys[index++];
+			}
+			virtual void send(int result) override{
+				rst = result;
+			}
+		
+		private:
+			int* spyKeys;
+			int index = 0;
+			int rst;
 	};
 }
 
 void test_2_1(void)
 {
+	int input[] = {12, 24, 38, -38, -12};
+	my::CommunicatorSpy spy(input);
+	MemoryAllocator myl(spy);
+	
+	for(int i = 0; i<5; i++){
+		myl.processRequest();
+	}
 	// TODO: // 문제2.(2-1)
 	// 요청 값의 입력이 다음의 순서대로 발생하는 상황: 12 -> 24 -> 38 -> -38 -> -12
-	int inputs[] = { 12, 24, 38, -38, -12 };
-	FakeInput fakeInput(inputs);
-	MemoryAllocator memory(fakeInput);
-
-	for (int i = 0; i < 5; ++i)
-		memory.processRequest();
 }
 
 void test_2_2(void)
