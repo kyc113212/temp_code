@@ -36,3 +36,63 @@ void test_2_2()
 	ftl.readBlock(2, 2);
 	ftl.deleteBlock(2, 2);
 }
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+namespace
+{
+	class FakeInput : public Communicator
+	{
+	public:
+		FakeInput(int keys[]) : fakeKey_(keys) {}		
+
+		virtual int getReqInput() override
+		{
+			return fakeKey_[index++];
+		}
+
+		void send(int result) override {
+			lastResult_ = result;
+		}
+
+		int getLastSent() {
+			return lastResult_;
+		}
+	private:
+		int lastResult_ = 0;
+		int* fakeKey_;
+		int index = 0;
+	};
+}
+
+void test_2_1(void)
+{
+	// TODO: // 문제2.(2-1)
+	// 요청 값의 입력이 다음의 순서대로 발생하는 상황: 12 -> 24 -> 38 -> -38 -> -12
+	int inputs[] = { 12, 24, 38, -38, -12 };
+	FakeInput fakeInput(inputs);
+	MemoryAllocator memory(fakeInput);
+
+	for (int i = 0; i < 5; ++i)
+		memory.processRequest();
+}
+
+void test_2_2(void)
+{
+	// TODO: 문제2.(2-2) 
+	// 요청 값의 입력이 다음의 순서대로 발생하는 상황: 18 -> 21 -> -18 -> 33 -> 41 -> -33
+	int inputs[] = { 18, 21, -18, 33, 41, -33 };
+	FakeInput fakeInput(inputs);
+	MemoryAllocator memory(fakeInput);
+
+	for (int i = 0; i < 6; ++i)
+		memory.processRequest();
+}
